@@ -8,6 +8,9 @@ document.getElementById('run').addEventListener("click", function () {
         .then(res => res.json())
         .then(pokemon => {
             console.log(pokemon);
+            const SPRITE = pokemon.sprites.front_default;
+            document.getElementById("image").src = SPRITE;
+            console.log(SPRITE);
         })
         .catch(function (err) {
             console.log(err, err.response);
