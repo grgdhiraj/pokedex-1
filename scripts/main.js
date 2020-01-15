@@ -1,5 +1,6 @@
-//GLOBAL VARIABLES
-let userInput = document.getElementById('input').value;
+document.getElementById('run').addEventListener("click", function () {
+
+    let userInput = document.getElementById('input').value;
 
 
     fetch(`https://pokeapi.co/api/v2/pokemon/` + userInput)
@@ -11,3 +12,4 @@ let userInput = document.getElementById('input').value;
         .catch(function (err) {
             console.log(err, err.response);
         });
+});
