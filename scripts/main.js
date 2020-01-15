@@ -6,6 +6,7 @@ let userInput = document.getElementById('input').value;
         .then(res => res.json())
         .then(pokemon => {
             console.log(pokemon);
+            console.log(userInput);
         })
         .catch(function (err) {
             console.log(err, err.response);
