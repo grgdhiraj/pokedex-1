@@ -1,34 +1,48 @@
-var allPokeMoves = [];
+class Pokemon {
+    constructor(allMoves, id, name, sprite, moveSelection, evoLink) {
+        this.allMoves = allMoves;
+        this.sprite = sprite;
+        this.name = name;
+        this.id = id;
+        this.moveSelection = moveSelection;
+        this.evoLink = evoLink;
+    }
+//FUNCTIONS
+}
 
+
+
+
+let aPokemon = new Pokemon();
+
+
+//ONCLICK EVENT
+document.getElementById('run').addEventListener("click", async function () {
+    
+    let userInput = document.getElementById('input').value;
+    await pokeData(userInput);
+    let data =  await pokeEvolutionChain(pokeData(userInput));
+    console.log(data);
+});
+
+
+//FETCHES
 async function pokeData(param) {
     fetch(`https://pokeapi.co/api/v2/pokemon/` + param.toLowerCase())
         .then(res => res.json())
         .then(pokemon => {
+    //VARS
+            aPokemon.allMoves = pokemon.moves;
+            aPokemon.sprite = pokemon.sprites.front_default;
+            aPokemon.name = pokemon.name;
+            aPokemon.id = pokemon.id;
+            aPokemon.evoLink = pokemon.species.url;
 
-//VARS
-            let randomMoves = [];
-            let movesToDisplay = [];
-            const SPRITE = pokemon.sprites.front_default;
-            allPokeMoves = pokemon.moves;
-            const EVOLUTIONLINK = pokemon.species.url;
-            console.log("evo: "+EVOLUTIONLINK);
-
-//FUNCTION CALLS
-            randomGenerator(randomMoves);
-            insertMoves(randomMoves, movesToDisplay);
-
-//CONSOLE
-
-//TO HTML
-            document.getElementById("sprite").src = SPRITE;
-            document.getElementById("name").innerHTML = pokemon.name;
-            document.getElementById("id").innerHTML = pokemon.id;
-
-            for (var i = 0; i < 4; i++) {
-                document.getElementById('move' + [i]).innerHTML = movesToDisplay[i];
-            }
-
-            return EVOLUTIONLINK;
+    //FUNCTION CALLS
+            let randomMoves = randomGenerator();
+            aPokemon.moveSelection = insertMoves(randomMoves);
+            toHTML();
+            pokeEvolutionChain(aPokemon.evoLink);
 
         })
         .catch(function (err) {
@@ -36,42 +50,51 @@ async function pokeData(param) {
         });
 }
 
+async function pokeEvolutionChain(param) {
+    await fetch(param)
+        .then(res => res.json())
+        .then(evoChain => {
 
-function randomGenerator(param) {
-    while (param.length < 4) {
-        var rand = Math.round(Math.random() * allPokeMoves.length);
-        if (param.indexOf(rand) === -1) {
-            param.push(rand);
+            //previousEvolution(chainID);
+
+            return evoChain.evolution_chain.url;
+
+
+        })
+        .catch(function (err) {
+            console.log(err, err.response);
+        });
+}
+
+async  function previousEvolution(param) {
+
+}
+
+//ALL OTHER FUNCTIONS
+function randomGenerator() {
+    let randomMoves = [];
+    while (randomMoves.length < 4) {
+        var rand = Math.round(Math.random() * aPokemon.allMoves.length);
+        if (randomMoves.indexOf(rand) === -1) {
+            randomMoves.push(rand);
         }
     }
-    return param;
+    return randomMoves;
 }
 
-function insertMoves(argOne, argTwo) {
-    for (var i = 0; i < argOne.length; i++) {
-        argTwo.push(allPokeMoves[argOne[i]].move.name);
+function insertMoves(randMoves) {
+    let movesToDisplay = [];
+    for (var i = 0; i < randMoves.length; i++) {
+        movesToDisplay.push(aPokemon.allMoves[randMoves[i]].move.name);
     }
-    return argTwo;
+    return movesToDisplay;
 }
 
-async function pokeEvolution() {
-
-
-}
-
-document.getElementById('run').addEventListener("click", function () {
-
-    let userInput = document.getElementById('input').value;
-    //pokeData(userInput).then(r => alert(r));
-    let aPokemon = new Pokemon('Pikachu', '25',  )
-
-});
-
-class Pokemon {
-    constructor(name, id, moves, evolution) {
-        this.name = name;
-        this.id = id;
-        this.moves = moves;
-        this.evolution = evolution;
+async function toHTML() {
+    document.getElementById("sprite").src = aPokemon.sprite;
+    document.getElementById("name").innerHTML = aPokemon.name;
+    document.getElementById("id").innerHTML = aPokemon.id;
+    for (var i = 0; i < 4; i++) {
+        document.getElementById('move' + [i]).innerHTML = aPokemon.moveSelection[i];
     }
 }
